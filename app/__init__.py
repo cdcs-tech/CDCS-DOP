@@ -5,7 +5,7 @@ from logging.handlers import TimedRotatingFileHandler
 from flask import Flask, render_template
 
 from app.config import config
-from app.extensions import db, migrate, login_manager
+from app.extensions import db, migrate
 from app.dashboard import dashboard_bp
 
 
@@ -22,7 +22,6 @@ def create_app(config_name="default"):
     # ----------------------------------------------------
     db.init_app(app)
     migrate.init_app(app, db)
-    login_manager.init_app(app)
 
     # ----------------------------------------------------
     # Register Blueprints

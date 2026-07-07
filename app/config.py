@@ -8,6 +8,12 @@ class Config:
     """Base configuration."""
 
     SECRET_KEY = os.getenv("SECRET_KEY", "change-this-secret-key")
+
+    # Database Configuration
+    BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+    SQLALCHEMY_DATABASE_URI = (
+        "sqlite:///" + os.path.join(BASE_DIR, "..", "instance", "cdcs.db")
+    )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 
@@ -30,5 +36,5 @@ config = {
     "development": DevelopmentConfig,
     "testing": TestingConfig,
     "production": ProductionConfig,
-    "default": DevelopmentConfig
+    "default": DevelopmentConfig,
 }
