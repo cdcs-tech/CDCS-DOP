@@ -1,15 +1,15 @@
 from datetime import datetime
-from flask import abort
+
+from flask import render_template
+
+from . import dashboard_bp
 
 
-from flask import Blueprint, render_template
-
-
-dashboard_bp = Blueprint("dashboard", __name__)
-
-
-@dashboard_bp.route("/")
+@dashboard_bp.route("/", endpoint="home")
 def home():
+    """
+    Enterprise Dashboard Home Page
+    """
 
     dashboard = {
         "organization": "Career Development & Consultancy Services (CDCS)",
@@ -17,19 +17,10 @@ def home():
         "current_date": datetime.now().strftime("%d %B %Y"),
         "database_status": "Connected",
         "environment": "Development",
-        "platform_status": "Operational"
+        "platform_status": "Healthy",
     }
 
     return render_template(
         "dashboard/index.html",
         dashboard=dashboard
     )
-
-
-@dashboard_bp.route("/health")
-def health():
-
-    return {
-        "status": "healthy",
-        "version": "1.0.0-alpha"
-    }
