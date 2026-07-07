@@ -1,0 +1,107 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}
+Dashboard
+{% endblock %}
+
+{% block content %}
+
+<h2 class="mb-3">
+    Welcome to CDCS Digital Operations Platform
+</h2>
+
+<p>
+    <strong>Organization:</strong> {{ dashboard.organization }}<br>
+    <strong>Version:</strong> {{ dashboard.version }}<br>
+    <strong>Date:</strong> {{ dashboard.current_date }}
+</p>
+
+<div class="row">
+
+    {% with title="Projects", value=0 %}
+        {% include "components/stat_card.html" %}
+    {% endwith %}
+
+    {% with title="Clients", value=0 %}
+        {% include "components/stat_card.html" %}
+    {% endwith %}
+
+    {% with title="Documents", value=0 %}
+        {% include "components/stat_card.html" %}
+    {% endwith %}
+
+    {% with title="Users", value=1 %}
+        {% include "components/stat_card.html" %}
+    {% endwith %}
+
+</div>
+
+<hr>
+
+<h4>Quick Actions</h4>
+
+<div class="d-flex gap-2 flex-wrap">
+
+    <button class="btn btn-primary">New Project</button>
+
+    <button class="btn btn-success">New Client</button>
+
+    <button class="btn btn-warning">Upload Record</button>
+
+    <button class="btn btn-info">Training</button>
+
+    <button class="btn btn-dark">Reports</button>
+
+</div>
+
+<hr>
+
+<div class="row mt-4">
+
+    <div class="col-md-6">
+
+        <div class="card">
+
+            <div class="card-header">
+
+                Recent Activity
+
+            </div>
+
+            <div class="card-body">
+
+                No recent activity available.
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-md-6">
+
+        <div class="card">
+
+            <div class="card-header">
+
+                System Information
+
+            </div>
+
+            <div class="card-body">
+
+                <ul>
+                    <li>Database: {{ dashboard.database_status }}</li>
+                    <li>Environment: {{ dashboard.environment }}</li>
+                    <li>Status: {{ dashboard.platform_status }}</li>
+                </ul>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
