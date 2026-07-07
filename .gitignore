@@ -5,3 +5,10 @@ __pycache__/
 instance/
 uploads/
 backups/
+venv/
+logs/
+*.log
+instance/*.db
+.vscode/
+*.py[cod]
+.DS_Store
