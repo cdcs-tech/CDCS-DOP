@@ -1,7 +1,7 @@
 import logging
 import os
 from logging.handlers import TimedRotatingFileHandler
-
+from app.system import system_bp
 from flask import Flask, render_template
 
 from app.config import config
@@ -27,6 +27,8 @@ def create_app(config_name="default"):
     # Register Blueprints
     # ----------------------------------------------------
     app.register_blueprint(dashboard_bp)
+
+    app.register_blueprint(system_bp)
 
     # ----------------------------------------------------
     # Error Handlers
