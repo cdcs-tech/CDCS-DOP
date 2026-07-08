@@ -1,12 +1,15 @@
 import logging
 import os
 from logging.handlers import TimedRotatingFileHandler
-from app.system import system_bp
+
 from flask import Flask, render_template
 
 from app.config import config
 from app.extensions import db, migrate
+
+from app.system import system_bp
 from app.dashboard import dashboard_bp
+from app.auth import auth_bp
 
 
 def create_app(config_name="default"):
@@ -26,9 +29,9 @@ def create_app(config_name="default"):
     # ----------------------------------------------------
     # Register Blueprints
     # ----------------------------------------------------
-    app.register_blueprint(dashboard_bp)
-
     app.register_blueprint(system_bp)
+    app.register_blueprint(dashboard_bp)
+    app.register_blueprint(auth_bp)
 
     # ----------------------------------------------------
     # Error Handlers
@@ -69,7 +72,7 @@ def create_app(config_name="default"):
     log_handler.setFormatter(formatter)
 
     if log_handler not in app.logger.handlers:
-         app.logger.addHandler(log_handler)
+        app.logger.addHandler(log_handler)
 
     app.logger.setLevel(logging.INFO)
     app.logger.info("CDCS-DOP application started successfully.")
