@@ -1,15 +1,24 @@
+"""
+CDCS Digital Operations Platform (CDCS-DOP)
+
+Application Factory
+
+Milestone 2 – Authentication & Security
+Package 2.1 – Authentication Foundation
+Stage 2.1.2 – Flask-Login Integration
+"""
+
 import logging
 import os
 from logging.handlers import TimedRotatingFileHandler
 
 from flask import Flask, render_template
 
-from app.config import config
-from app.extensions import db, migrate
-
-from app.system import system_bp
-from app.dashboard import dashboard_bp
 from app.auth import auth_bp
+from app.config import config
+from app.dashboard import dashboard_bp
+from app.extensions import db, login_manager, migrate
+from app.system import system_bp
 
 
 def create_app(config_name="default"):
@@ -25,6 +34,7 @@ def create_app(config_name="default"):
     # ----------------------------------------------------
     db.init_app(app)
     migrate.init_app(app, db)
+    login_manager.init_app(app)
 
     # ----------------------------------------------------
     # Register Blueprints
@@ -60,7 +70,7 @@ def create_app(config_name="default"):
         when="midnight",
         interval=1,
         backupCount=30,
-        encoding="utf-8"
+        encoding="utf-8",
     )
 
     log_handler.setLevel(logging.INFO)
