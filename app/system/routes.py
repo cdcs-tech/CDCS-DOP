@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from flask import current_app, jsonify, render_template
+from flask_login import login_required
 
 from app.extensions import db
 from . import system_bp
@@ -10,7 +11,9 @@ from . import system_bp
 def health():
     """
     Health Check API
-    Returns application health information in JSON format.
+
+    Public endpoint intended for infrastructure monitoring.
+    Returns minimal application health information in JSON format.
     """
 
     database_status = "Connected"
@@ -34,10 +37,13 @@ def health():
 
 
 @system_bp.route("/system")
+@login_required
 def system_information():
     """
     System Information Page
-    Displays application health information in HTML format.
+
+    Displays application health information for
+    authenticated users.
     """
 
     database_status = "Connected"
