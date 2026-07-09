@@ -19,6 +19,7 @@ from app.config import config
 from app.dashboard import dashboard_bp
 from app.extensions import db, login_manager, migrate
 from app.system import system_bp
+from app.commands.registry import register_commands
 
 
 def create_app(config_name="default"):
@@ -42,6 +43,12 @@ def create_app(config_name="default"):
     app.register_blueprint(system_bp)
     app.register_blueprint(dashboard_bp)
     app.register_blueprint(auth_bp)
+
+    # ----------------------------------------------------
+    # Register CLI Commands
+    # ----------------------------------------------------
+
+    register_commands(app)
 
     # ----------------------------------------------------
     # Error Handlers
