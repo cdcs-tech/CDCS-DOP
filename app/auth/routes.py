@@ -5,7 +5,7 @@ Authentication Routes
 
 Milestone 2 – Authentication & Security
 Package 2.1 – Authentication Foundation
-Stage 2.1.4 – Login Interface & Authentication Flow
+Stage 2.1.5.1 – Logout Route
 """
 
 from flask import (
@@ -15,7 +15,11 @@ from flask import (
     url_for
 )
 
-from flask_login import login_user
+from flask_login import (
+    login_required,
+    login_user,
+    logout_user
+)
 
 from app.auth import auth_bp
 from app.auth.forms import LoginForm
@@ -27,7 +31,6 @@ def index():
     """
     Authentication module landing page.
     """
-
     return render_template("auth/index.html")
 
 
@@ -42,14 +45,13 @@ def login():
     if form.validate_on_submit():
 
         user = User.query.filter_by(
-            email=form.email.data
+            email=form.email.data.strip().lower()
         ).first()
 
-        if user and user.check_password(
-            form.password.data
-        ):
+        if user and user.check_password(form.password.data):
 
             if not user.is_active:
+
                 flash(
                     "Your account is inactive. Please contact an administrator.",
                     "warning"
@@ -65,7 +67,7 @@ def login():
             )
 
             flash(
-                "Login successful.",
+                "Welcome back!",
                 "success"
             )
 
@@ -81,4 +83,23 @@ def login():
     return render_template(
         "auth/login.html",
         form=form
+    )
+
+
+@auth_bp.route("/logout")
+@login_required
+def logout():
+    """
+    Securely log the current user out.
+    """
+
+    logout_user()
+
+    flash(
+        "You have been logged out successfully.",
+        "success"
+    )
+
+    return redirect(
+        url_for("auth.login")
     )
