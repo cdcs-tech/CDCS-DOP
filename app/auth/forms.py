@@ -10,7 +10,7 @@ Stage 2.1.4 – Login Interface & Authentication Flow
 
 from flask_wtf import FlaskForm
 from wtforms import BooleanField, PasswordField, StringField, SubmitField
-from wtforms.validators import DataRequired, Email, Length
+from wtforms.validators import DataRequired, Length
 
 
 class LoginForm(FlaskForm):
@@ -25,7 +25,6 @@ class LoginForm(FlaskForm):
         "Email Address",
         validators=[
             DataRequired(),
-            Email(),
             Length(max=120)
         ]
     )
