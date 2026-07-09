@@ -1,14 +1,19 @@
 from datetime import datetime
 
 from flask import render_template
+from flask_login import login_required
 
 from . import dashboard_bp
 
 
 @dashboard_bp.route("/", endpoint="home")
+@login_required
 def home():
     """
-    Enterprise Dashboard Home Page
+    Enterprise Dashboard Home Page.
+
+    This route serves as the primary landing page for
+    authenticated users after a successful login.
     """
 
     dashboard = {
