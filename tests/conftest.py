@@ -88,3 +88,24 @@ def clean_database(app):
             db.session.execute(table.delete())
 
         db.session.commit()
+
+
+@pytest.fixture(autouse=True)
+def cleanup_login_session(client):
+    """
+    Ensure every test starts without an authenticated session.
+
+    Prevents authentication state leakage
+    between tests.
+    """
+
+    with client.session_transaction() as session:
+        session.clear()
+
+    yield
+
+    with client.session_transaction() as session:
+        session.clear()
+
+
+
