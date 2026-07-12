@@ -1,60 +1,92 @@
 """
 CDCS Digital Operations Platform (CDCS-DOP)
 
-System Blueprint Tests
+System Route Tests
 
 Milestone 2 – Authentication & Security
-Package 2.1 – Authentication Foundation
-Stage 2.1.5.6 – Package Testing & Release
+Package 2.2 – Authorization & RBAC
 """
 
-from app.models.user import User
 from app.extensions import db
+from app.models.permission import Permission
+from app.models.role import Role
+from app.models.user import User
+from app.services.authorization_service import AuthorizationService
 
 
-
-def create_test_user():
+def login_system_admin(client):
     """
-    Create a test authenticated user.
+    Create and authenticate a system administrator
+    with the required permission.
     """
 
-    user = User(
-        full_name="Test Administrator",
-        email="system@test.com",
-        role="Administrator",
-        is_active=True,
+    user = User.query.filter_by(
+        email="system@test.com"
+    ).first()
+
+    if user is None:
+        user = User(
+            full_name="System Administrator",
+            email="system@test.com",
+            is_active=True
+        )
+
+        user.set_password("password123")
+
+        db.session.add(user)
+        db.session.commit()
+
+    role = Role.query.filter_by(
+        name="Administrator"
+    ).first()
+
+    if role is None:
+        role = Role(
+            name="Administrator",
+            description="System Administrator"
+        )
+
+        db.session.add(role)
+        db.session.commit()
+
+    permission = Permission.query.filter_by(
+        name="system.manage"
+    ).first()
+
+    if permission is None:
+        permission = Permission(
+            name="system.manage",
+            module="System",
+            action="Manage",
+            description="Manage system settings"
+        )
+
+        db.session.add(permission)
+        db.session.commit()
+
+    AuthorizationService.assign_role(
+        user,
+        role
     )
 
-    user.set_password("Password123")
+    AuthorizationService.grant_permission(
+        role,
+        permission
+    )
 
-    db.session.add(user)
-    db.session.commit()
-
-    return user
-
-
-
-def login_test_user(client):
-    """
-    Login the test account.
-    """
-
-    create_test_user()
-
-    return client.post(
+    client.post(
         "/auth/login",
         data={
             "email": "system@test.com",
-            "password": "Password123",
+            "password": "password123"
         },
-        follow_redirects=True,
+        follow_redirects=True
     )
-
 
 
 def test_health_endpoint(client):
     """
-    Health API remains publicly accessible.
+    Health endpoint remains public.
     """
 
     response = client.get("/health")
@@ -69,30 +101,31 @@ def test_health_endpoint(client):
     ]
 
 
-
 def test_system_page_requires_login(client):
     """
-    Anonymous users cannot access system information.
+    Anonymous users are redirected
+    to the login page.
     """
 
     response = client.get(
-    "/system",
-    follow_redirects=False
-)
+        "/system",
+        follow_redirects=False
+    )
 
-    print("STATUS:", response.status_code)
-    print("LOCATION:", response.headers.get("Location"))
-    print(response.data.decode())
-
+    assert response.status_code == 302
+    assert "/auth/login" in response.headers["Location"]
 
 
-def test_system_page_authenticated(client):
+def test_system_page_authenticated(client, app):
     """
-    Authenticated users can access system information.
+    Authenticated administrator with the required
+    permission can access the system page.
     """
 
-    login_test_user(client)
+    with app.app_context():
+        login_system_admin(client)
 
     response = client.get("/system")
 
     assert response.status_code == 200
+    assert b"CDCS Digital Operations Platform" in response.data

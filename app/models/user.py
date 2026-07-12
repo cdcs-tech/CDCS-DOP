@@ -13,6 +13,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 from app.extensions import db
 from app.models.base import BaseModel
+from app.models.user_role import user_roles
 
 
 class User(BaseModel, UserMixin):
@@ -24,6 +25,12 @@ class User(BaseModel, UserMixin):
     """
 
     __tablename__ = "users"
+
+    roles = db.relationship(
+    "Role",
+    secondary=user_roles,
+    backref="users"
+    )
 
     # ----------------------------------------------------
     # User Information

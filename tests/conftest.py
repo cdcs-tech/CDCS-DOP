@@ -3,10 +3,7 @@ CDCS Digital Operations Platform (CDCS-DOP)
 
 Pytest Configuration
 
-Provides shared fixtures for all automated tests.
-
-Milestone 2 – Authentication & Security
-Package 2.1 – Authentication Foundation
+Shared fixtures for all regression tests.
 """
 
 import pytest
@@ -15,20 +12,18 @@ from app import create_app
 from app.extensions import db
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def app():
     """
-    Create a Flask application configured
-    specifically for automated testing.
+    Create a fresh application for each test session.
     """
 
-    app = create_app()
+    app = create_app("testing")
 
     app.config.update(
         TESTING=True,
-        SQLALCHEMY_DATABASE_URI="sqlite:///:memory:",
         WTF_CSRF_ENABLED=False,
-        LOGIN_DISABLED=False,
+        SQLALCHEMY_DATABASE_URI="sqlite:///:memory:"
     )
 
     with app.app_context():
@@ -41,7 +36,7 @@ def app():
         db.drop_all()
 
 
-@pytest.fixture()
+@pytest.fixture
 def client(app):
     """
     Flask test client.
@@ -50,62 +45,11 @@ def client(app):
     return app.test_client()
 
 
-@pytest.fixture()
-def runner(app):
-    """
-    Flask CLI runner.
-    """
-
-    return app.test_cli_runner()
-
-
-@pytest.fixture()
-def app_context(app):
-    """
-    Application context for database operations.
-    """
-
-    with app.app_context():
-        yield
-
-
-@pytest.fixture()
-def clean_database(app):
-    """
-    Ensure every test starts with a clean database.
-    """
-
-    with app.app_context():
-
-        for table in reversed(db.metadata.sorted_tables):
-            db.session.execute(table.delete())
-
-        db.session.commit()
-
-        yield
-
-        for table in reversed(db.metadata.sorted_tables):
-            db.session.execute(table.delete())
-
-        db.session.commit()
-
-
 @pytest.fixture(autouse=True)
-def cleanup_login_session(client):
+def cleanup_auth_state():
     """
-    Ensure every test starts without an authenticated session.
-
-    Prevents authentication state leakage
+    Ensure authentication/session state is reset
     between tests.
     """
 
-    with client.session_transaction() as session:
-        session.clear()
-
     yield
-
-    with client.session_transaction() as session:
-        session.clear()
-
-
-
