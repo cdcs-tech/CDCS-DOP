@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}User Management{% endblock %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>User Management</h2>
+
+        <a href="{{ url_for('users.create') }}"
+           class="btn btn-primary">
+            Create User
+        </a>
+    </div>
+
+    {% if users %}
+
+    <table class="table table-bordered table-hover">
+
+        <thead class="table-light">
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Status</th>
+                <th>Roles</th>
+                <th width="120">Actions</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+        {% for user in users %}
+
+            <tr>
+
+                <td>{{ user.full_name }}</td>
+
+                <td>{{ user.email }}</td>
+
+                <td>
+
+                    {% if user.is_active %}
+                        Active
+                    {% else %}
+                        Inactive
+                    {% endif %}
+
+                </td>
+
+                <td>
+
+                    {% if user.roles %}
+
+                        {% for role in user.roles %}
+                            {{ role.name }}{% if not loop.last %}, {% endif %}
+                        {% endfor %}
+
+                    {% else %}
+                        —
+                    {% endif %}
+
+                </td>
+
+                <td>
+
+                    <a
+                        href="{{ url_for('users.detail', user_id=user.id) }}"
+                        class="btn btn-sm btn-outline-primary">
+
+                        View
+
+                    </a>
+
+                </td>
+
+            </tr>
+
+        {% endfor %}
+
+        </tbody>
+
+    </table>
+
+    {% else %}
+
+        <div class="alert alert-info">
+            No users found.
+        </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

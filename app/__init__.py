@@ -20,6 +20,7 @@ from app.dashboard import dashboard_bp
 from app.extensions import db, login_manager, migrate
 from app.system import system_bp
 from app.commands.registry import register_commands
+from app.users import users_bp
 
 
 def create_app(config_name="default"):
@@ -43,6 +44,7 @@ def create_app(config_name="default"):
     app.register_blueprint(system_bp)
     app.register_blueprint(dashboard_bp)
     app.register_blueprint(auth_bp)
+    app.register_blueprint(users_bp)
 
     # ----------------------------------------------------
     # Register CLI Commands
