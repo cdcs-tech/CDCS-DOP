@@ -4,41 +4,43 @@ CDCS Digital Operations Platform (CDCS-DOP)
 Authentication Routes
 
 Milestone 2 – Authentication & Security
-Package 2.1 – Authentication Foundation
-Stage 2.1.5.1 – Logout Route
+Stage 2.4.1 – Login Interface Foundation
 """
+
+from app.auth import auth_bp
+from urllib.parse import urlparse
 
 from flask import (
     flash,
     redirect,
     render_template,
-    url_for
+    request,
+    url_for,
 )
-
 from flask_login import (
+    current_user,
     login_required,
     login_user,
-    logout_user
+    logout_user,
 )
 
-from app.auth import auth_bp
 from app.auth.forms import LoginForm
 from app.models.user import User
 
 
-@auth_bp.route("/")
-def index():
-    """
-    Authentication module landing page.
-    """
-    return render_template("auth/index.html")
 
+# ----------------------------------------------------
+# Login
+# ----------------------------------------------------
 
 @auth_bp.route("/login", methods=["GET", "POST"])
 def login():
     """
-    Authenticate users using email and password.
+    Authenticate a user.
     """
+
+    if current_user.is_authenticated:
+        return redirect(url_for("dashboard.home"))
 
     form = LoginForm()
 
@@ -48,18 +50,11 @@ def login():
             email=form.email.data.strip().lower()
         ).first()
 
-        if user and user.check_password(form.password.data):
-
-            if not user.is_active:
-
-                flash(
-                    "Your account is inactive. Please contact an administrator.",
-                    "warning"
-                )
-
-                return redirect(
-                    url_for("auth.login")
-                )
+        if (
+            user
+            and user.is_active
+            and user.check_password(form.password.data)
+        ):
 
             login_user(
                 user,
@@ -67,9 +62,17 @@ def login():
             )
 
             flash(
-                "Welcome back!",
-                "success"
+                f"Welcome back, {user.full_name}.",
+                "success",
             )
+
+            next_page = request.args.get("next")
+
+            if (
+                next_page
+                and urlparse(next_page).netloc == ""
+            ):
+                return redirect(next_page)
 
             return redirect(
                 url_for("dashboard.home")
@@ -77,27 +80,32 @@ def login():
 
         flash(
             "Invalid email or password.",
-            "danger"
+            "danger",
         )
 
     return render_template(
         "auth/login.html",
-        form=form
+        title="Sign In",
+        form=form,
     )
 
+
+# ----------------------------------------------------
+# Logout
+# ----------------------------------------------------
 
 @auth_bp.route("/logout")
 @login_required
 def logout():
     """
-    Securely log the current user out.
+    Log out the current user.
     """
 
     logout_user()
 
     flash(
         "You have been logged out successfully.",
-        "success"
+        "info",
     )
 
     return redirect(

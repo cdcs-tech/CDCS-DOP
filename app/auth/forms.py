@@ -4,37 +4,51 @@ CDCS Digital Operations Platform (CDCS-DOP)
 Authentication Forms
 
 Milestone 2 – Authentication & Security
-Package 2.1 – Authentication Foundation
-Stage 2.1.4 – Login Interface & Authentication Flow
+Stage 2.4.1 – Login Interface Foundation
 """
 
 from flask_wtf import FlaskForm
-from wtforms import BooleanField, PasswordField, StringField, SubmitField
-from wtforms.validators import DataRequired, Length
+from wtforms import (
+    BooleanField,
+    PasswordField,
+    StringField,
+    SubmitField,
+)
+from wtforms.validators import (
+    DataRequired,
+    Email,
+    Length,
+)
 
 
 class LoginForm(FlaskForm):
     """
     User login form.
-
-    Authentication is performed using email
-    and password credentials.
     """
 
     email = StringField(
         "Email Address",
         validators=[
             DataRequired(),
-            Length(max=120)
-        ]
+            Email(),
+            Length(max=120),
+        ],
+        render_kw={
+            "placeholder": "Enter your email address",
+            "autocomplete": "email",
+        },
     )
 
     password = PasswordField(
         "Password",
         validators=[
             DataRequired(),
-            Length(min=6)
-        ]
+            Length(min=8),
+        ],
+        render_kw={
+            "placeholder": "Enter your password",
+            "autocomplete": "current-password",
+        },
     )
 
     remember = BooleanField(
@@ -42,5 +56,5 @@ class LoginForm(FlaskForm):
     )
 
     submit = SubmitField(
-        "Login"
+        "Sign In"
     )
